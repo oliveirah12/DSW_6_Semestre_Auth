@@ -94,23 +94,25 @@ class userController {
 
 
     checkToken(request, response, next){
-        const authHeader = request.headers['authorization']
-        const token = authHeader && authHeader.split(" ")[1]
-        console.log(token + ' - Linha 92')
+        //const authHeader = 
+        //console.log(authHeader)
+        const token = request.headers['authorization']
+        console.log(token + ' - Token')
 
-        if(!token){
-            return response.status(401).json({msg: 'Acesso negado'})
-        }
-
-        try {
-            const secret = process.env.SECRET
-
-            jwt.verify(token, secret)
-            next()
-
-        } catch (error) {
-            console.log(error)
-            response.status(400).json({msg: 'Token inválido'})
+        if (!token) {
+            response.status(401).json({ msg: 'Acesso negado', isValidToken: false });
+        } else {
+            try {
+                const secret = process.env.SECRET;
+    
+                jwt.verify(token, secret);
+                request.token = token;
+    
+                response.status(200).json({ msg: 'Token válido', isValidToken: true });
+            } catch (error) {
+                console.log(error);
+                response.status(400).json({ msg: 'Token inválido', isValidToken: false });
+            }
         }
     }
     
